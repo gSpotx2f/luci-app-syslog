@@ -1,0 +1,12 @@
+{
+    "luci-app-syslog": {
+        "description": "Grant access to syslog procedures",
+        "read": {
+            "cgi-io": [ "exec" ],
+            "file": {
+                "/sbin/logread -l [0-9]* -e*": [ "exec" ],
+                "/usr/sbin/logread -l [0-9]* -e*": [ "exec" ]
+            }
+        }
+    }
+}
