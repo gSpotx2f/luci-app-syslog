@@ -45,7 +45,7 @@ return L.view.extend({
 			'type': 'text',
 			'form': 'logForm',
 			'class': 'cbi-input-text',
-			'style': 'width:4em !important; min-width:4em !important',
+			'style': 'width:4em !important; min-width:4em !important; margin-bottom:0.3em !important',
 			'maxlength': 5,
 		});
 		tailValue.value = this.tailDefault;
@@ -57,7 +57,7 @@ return L.view.extend({
 			'type': 'text',
 			'form': 'logForm',
 			'class': 'cbi-input-text',
-			'style': 'margin-left:1em !important; width:16em !important; min-width:16em !important',
+			'style': 'min-width:16em !important; margin-right:1em !important; margin-bottom:0.3em !important',
 			'placeholder': _('Message filter'),
 			'data-tooltip': _('Filter messages with a regexp'),
 		});
@@ -65,8 +65,8 @@ return L.view.extend({
 		let logFormSubmitBtn = E('input', {
 			'type': 'submit',
 			'form': 'logForm',
-			'class': 'cbi-button btn',
-			'style': 'margin-left:1em !important; vertical-align:middle',
+			'class': 'cbi-button btn cbi-button-action',
+			'style': 'margin-right:1em !important; margin-bottom:0.3em !important;',
 			'value': _('Apply'),
 			'click': ev => ev.target.blur(),
 		});
@@ -77,12 +77,16 @@ return L.view.extend({
 			E('div', { 'class': 'cbi-section fade-in' },
 				E('div', { 'class': 'cbi-section-node' },
 					E('div', { 'id': 'contentSyslog', 'class': 'cbi-value' }, [
-						E('label', { 'class': 'cbi-value-title', 'for': 'tailValue' },
-							_('Show only the last messages')),
+						E('label', {
+							'class': 'cbi-value-title',
+							'for': 'tailValue',
+							'style': 'margin-bottom:0.3em !important',
+						}, _('Show only the last messages')),
 						E('div', { 'class': 'cbi-value-field' }, [
 							tailValue,
 							E('input', {
 								'type': 'button',
+								'form': 'logForm',
 								'class': 'cbi-button btn cbi-button-reset',
 								'value': 'Χ',
 								'click': ev => {
@@ -90,24 +94,14 @@ return L.view.extend({
 									logFormSubmitBtn.click();
 									ev.target.blur();
 								},
-
+								'style': 'margin-right:1em !important; margin-bottom:0.3em !important; max-width:4em !important',
 							}),
 							logFilter,
-							E('input', {
-								'type': 'button',
-								'class': 'cbi-button btn cbi-button-reset',
-								'value': 'Χ',
-								'click': ev => {
-									logFilter.value = null;
-									logFormSubmitBtn.click();
-									ev.target.blur();
-								},
-							}),
 							logFormSubmitBtn,
 							E('form', {
 								'id': 'logForm',
 								'name': 'logForm',
-								'style': 'display:inline-block; margin-left:1em !important',
+								'style': 'display:inline-block; margin-bottom:0.3em !important',
 								'submit': ui.createHandlerFn(this, function(ev) {
 									ev.preventDefault();
 									let formElems = Array.from(document.forms.logForm.elements);
