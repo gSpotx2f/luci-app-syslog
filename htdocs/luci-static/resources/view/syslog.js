@@ -27,7 +27,7 @@ return L.view.extend({
 	},
 
 	render: function(logdata) {
-		let navBtnsTop = '120px';
+		let navBtnsTop = '1px';
 
 		let logTextarea = E('textarea', {
 			'id': 'syslog',
