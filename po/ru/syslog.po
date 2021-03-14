@@ -15,20 +15,23 @@ msgstr ""
 msgid "Apply"
 msgstr "Применить"
 
-msgid "Filter messages with a regexp"
-msgstr "Фильтровать сообщения с помощью регулярного выражения"
+msgid "Entries filter"
+msgstr "Фильтр записей"
 
-msgid "Message filter"
-msgstr "Фильтр сообщений"
+msgid "Filter entries using regexp"
+msgstr "Фильтровать записи с помощью регулярного выражения"
 
 msgid "No matches..."
 msgstr "Нет совпадений..."
 
-msgid "Show only the last messages"
-msgstr "Показать только последние сообщения"
+msgid "Show only the last entries"
+msgstr "Показать только последние записи"
 
 msgid "System Log"
 msgstr "Системный журнал"
 
 msgid "Unable to load log data:"
 msgstr "Невозможно загрузить данные лога:"
+
+msgid "Wrong regular expression"
+msgstr "Неверное регулярное выражение"

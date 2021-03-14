@@ -4,9 +4,8 @@
 
 return L.view.extend({
 	tailDefault: 25,
-	patternDefault: '^',
 
-	getLogData: function(last, pattern) {
+	getLogData: function(tail) {
 		return Promise.all([
 			L.resolveDefault(fs.stat('/sbin/logread'), null),
 			L.resolveDefault(fs.stat('/usr/sbin/logread'), null),
@@ -14,7 +13,7 @@ return L.view.extend({
 			let logger = (stat[0]) ? stat[0].path : (stat[1]) ? stat[1].path : null;
 
 			if(logger) {
-				return fs.exec_direct(logger, [ '-l', last, '-e', pattern ]).catch(err => {
+				return fs.exec_direct(logger, [ '-l', (tail || ' '), '-e', '^' ]).catch(err => {
 					ui.addNotification(null, E('p', {}, _('Unable to load log data: ' + err.message)));
 					return '';
 				});
@@ -22,8 +21,35 @@ return L.view.extend({
 		});
 	},
 
+	parseLogData: function(logdata) {
+		return logdata.trim().split(/\n/);
+	},
+
+	setLogFilter: function(cArr) {
+		let fPattern = document.getElementById('logFilter').value;
+		if(!fPattern) {
+			return cArr;
+		};
+		let fArr = [];
+		try {
+			fArr = cArr.filter(s => new RegExp(fPattern, 'iu').test(s));
+		} catch(err) {
+			if(err.name === 'SyntaxError') {
+				ui.addNotification(null,
+					E('p', {}, _('Wrong regular expression') + ': ' + err.message));
+				return cArr;
+			} else {
+				throw err;
+			};
+		};
+		if(fArr.length === 0) {
+			fArr.push(_('No matches...'));
+		};
+		return fArr;
+	},
+
 	load: function() {
-		return this.getLogData(this.tailDefault, this.patternDefault);
+		return this.getLogData(this.tailDefault);
 	},
 
 	render: function(logdata) {
@@ -58,8 +84,8 @@ return L.view.extend({
 			'form': 'logForm',
 			'class': 'cbi-input-text',
 			'style': 'min-width:16em !important; margin-right:1em !important; margin-bottom:0.3em !important',
-			'placeholder': _('Message filter'),
-			'data-tooltip': _('Filter messages with a regexp'),
+			'placeholder': _('Entries filter'),
+			'data-tooltip': _('Filter entries using regexp'),
 		});
 
 		let logFormSubmitBtn = E('input', {
@@ -81,7 +107,7 @@ return L.view.extend({
 							'class': 'cbi-value-title',
 							'for': 'tailValue',
 							'style': 'margin-bottom:0.3em !important',
-						}, _('Show only the last messages')),
+						}, _('Show only the last entries')),
 						E('div', { 'class': 'cbi-value-field' }, [
 							tailValue,
 							E('input', {
@@ -108,19 +134,12 @@ return L.view.extend({
 									formElems.forEach(e => e.disabled = true);
 
 									return this.getLogData(
-										(tailValue.value && tailValue.value > 0) ? tailValue.value : 0,
-										logFilter.value || this.patternDefault
+										(tailValue.value && tailValue.value > 0) ? tailValue.value : 0
 									).then(logdata => {
-										logdata = logdata || '';
-										let loglines = logdata.match(/\n/g) || [];
-
-										if(loglines.length === 0) {
-											logdata = _('No matches...');
-										};
-
+										let loglines = this.setLogFilter(this.parseLogData(logdata));
 										logTextarea.rows = (loglines.length < this.tailDefault) ?
 											this.tailDefault : loglines.length;
-										logTextarea.value = logdata.trim();
+										logTextarea.value = loglines.join('\n');
 									}).finally(() => {
 										formElems.forEach(e => e.disabled = false);
 									});
@@ -131,31 +150,29 @@ return L.view.extend({
 				)
 			),
 			E('div', { 'class': 'cbi-section fade-in' },
-				E('div', { 'class': 'cbi-section-node' },
-					E('div', { 'class': 'cbi-value' }, [
-						E('div', { 'style': 'position:fixed' }, [
-							E('button', {
-								'class': 'btn',
-								'style': 'position:relative; display:block; margin:0 !important; left:1px; top:'
-									+ navBtnsTop,
-								'click': ev => {
-									document.getElementById('logTitle').scrollIntoView(true);
-									ev.target.blur();
-								},
-							}, '&#8593;'),
-							E('button', {
-								'class': 'btn',
-								'style': 'position:relative; display:block; margin:0 !important; margin-top:1px !important; left:1px; top:'
-									+ navBtnsTop,
-								'click': ev => {
-									logTextarea.scrollIntoView(false);
-									ev.target.blur();
-								},
-							}, '&#8595;'),
-						]),
-						logTextarea,
-					])
-				)
+				E('div', { 'class': 'cbi-section-node' }, [
+					E('div', { 'style': 'position:fixed' }, [
+						E('button', {
+							'class': 'btn',
+							'style': 'position:relative; display:block; margin:0 !important; left:1px; top:'
+								+ navBtnsTop,
+							'click': ev => {
+								document.getElementById('logTitle').scrollIntoView(true);
+								ev.target.blur();
+							},
+						}, '&#8593;'),
+						E('button', {
+							'class': 'btn',
+							'style': 'position:relative; display:block; margin:0 !important; margin-top:1px !important; left:1px; top:'
+								+ navBtnsTop,
+							'click': ev => {
+								logTextarea.scrollIntoView(false);
+								ev.target.blur();
+							},
+						}, '&#8595;'),
+					]),
+					logTextarea,
+				])
 			),
 		]);
 	},
