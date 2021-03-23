@@ -13,8 +13,10 @@ return L.view.extend({
 			let logger = (stat[0]) ? stat[0].path : (stat[1]) ? stat[1].path : null;
 
 			if(logger) {
-				return fs.exec_direct(logger, [ '-l', (tail || ' '), '-e', '^' ]).catch(err => {
-					ui.addNotification(null, E('p', {}, _('Unable to load log data: ' + err.message)));
+				let loggerArgs = (tail) ? [ '-l', tail, '-e', '^' ] : [ '-e', '^' ];
+
+				return fs.exec_direct(logger, loggerArgs).catch(err => {
+					ui.addNotification(null, E('p', {}, _('Unable to load log data:') + ' ' + err.message));
 					return '';
 				});
 			};
