@@ -1,3 +1,5 @@
+# Deprecated! [Here](https://github.com/gSpotx2f/luci-app-log) is a new log application.
+
 # luci-app-syslog
 Advanced system log (tail, search) for LuCI (OpenWrt webUI).
 
